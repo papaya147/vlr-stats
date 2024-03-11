@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -64,9 +65,9 @@ func (p Players) save(file *os.File) error {
 
 var playersBaseUrl = `https://vlrgg.cyclic.app/api/players`
 
-func SavePlayers(file *os.File) error {
+func SavePlayers(ctx context.Context, file *os.File) error {
 	var players Players
-	if err := util.Request(playersBaseUrl, &players); err != nil {
+	if err := util.Request(ctx, playersBaseUrl, &players); err != nil {
 		return err
 	}
 

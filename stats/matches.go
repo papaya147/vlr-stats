@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -47,9 +48,9 @@ func (m Matches) save(file *os.File) error {
 
 var matchResultsBaseUrl = `https://vlrgg.cyclic.app/api/matches/results`
 
-func SaveMatchResults(file *os.File) error {
+func SaveMatchResults(ctx context.Context, file *os.File) error {
 	var matches Matches
-	if err := util.Request(matchResultsBaseUrl, &matches); err != nil {
+	if err := util.Request(ctx, matchResultsBaseUrl, &matches); err != nil {
 		return err
 	}
 

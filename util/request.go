@@ -1,13 +1,19 @@
 package util
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 )
 
-func Request(url string, out any) error {
-	resp, err := http.Get(url)
+func Request(ctx context.Context, url string, out any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}

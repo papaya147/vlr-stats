@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -43,9 +44,9 @@ func (t Teams) save(file *os.File) error {
 
 var rankingsBaseUrl = `https://vlrgg.cyclic.app/api/rankings/%s`
 
-func SaveRankings(region string, file *os.File) error {
+func SaveRankings(ctx context.Context, region string, file *os.File) error {
 	var teams Teams
-	if err := util.Request(fmt.Sprintf(rankingsBaseUrl, region), &teams); err != nil {
+	if err := util.Request(ctx, fmt.Sprintf(rankingsBaseUrl, region), &teams); err != nil {
 		return err
 	}
 

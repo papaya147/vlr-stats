@@ -1,50 +1,54 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
+	"github.com/papaya147/parallelize"
 	"github.com/papaya147/vlr-stats/stats"
 	"github.com/papaya147/vlr-stats/util"
 )
 
 func main() {
-	if err := loadRankings(); err != nil {
-		log.Println("error from loading rankings:", err)
-	}
-	if err := loadPlayers(); err != nil {
-		log.Println("error from loading players:", err)
-	}
-	if err := loadMatchResults(); err != nil {
-		log.Println("error from loading match results:", err)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	group := parallelize.NewSyncGroup()
+	parallelize.AddMethodWithoutArgs(group, loadRankings, ctx)
+	parallelize.AddMethodWithoutArgs(group, loadPlayers, ctx)
+	parallelize.AddMethodWithoutArgs(group, loadMatchResults, ctx)
+	if err := group.Run(); err != nil {
+		log.Println(err)
 	}
 }
 
-func loadRankings() error {
+func loadRankings(ctx context.Context) error {
 	rankingsFile, err := util.CreateAppendFile("rankings.csv")
 	if err != nil {
 		return err
 	}
 	defer rankingsFile.Close()
 
-	return stats.SaveRankings("latin-america", rankingsFile)
+	return stats.SaveRankings(ctx, "latin-america", rankingsFile)
 }
 
-func loadPlayers() error {
+func loadPlayers(ctx context.Context) error {
 	playersFile, err := util.CreateAppendFile("players.csv")
 	if err != nil {
 		return err
 	}
 	defer playersFile.Close()
 
-	return stats.SavePlayers(playersFile)
+	return stats.SavePlayers(ctx, playersFile)
 }
 
-func loadMatchResults() error {
+func loadMatchResults(ctx context.Context) error {
 	matchesFile, err := util.CreateAppendFile("match-results.csv")
 	if err != nil {
 		return err
 	}
 	defer matchesFile.Close()
 
-	return stats.SaveMatchResults(matchesFile)
+	return stats.SaveMatchResults(ctx, matchesFile)
 }
